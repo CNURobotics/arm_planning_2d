@@ -1,12 +1,32 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Simple 2-link robot arm simulation for generating graphics for CS 471/510
-#
-# by David C. Conner
-#  david.conner@cnu.edu
-#
+'''
+    Simple 2-link robot arm simulation for generating graphics for CS 471/510
 
+    The MIT License (MIT)
+
+    Copyright (c) 2015 David Conner (david.conner@cnu.edu)
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in
+    all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+    THE SOFTWARE.
+
+'''
 
 import os.path
 import cv2
@@ -97,7 +117,7 @@ def theta2xyz(t1,t2):
 if (True): # build C-space map
 
     print "Define the torus ..."
-    pi_diff = np.pi/72.0;#36.0
+    pi_diff = np.pi/100.0;#72.0;#36.0
     thetas = np.arange(-np.pi, np.pi+pi_diff, pi_diff)
     t1grid,t2grid = np.meshgrid(thetas,thetas)
 
@@ -156,6 +176,20 @@ if (True): # build C-space map
 
     fig1.savefig( "config_space.png", format = "png", bbox_inches = 'tight', pad_inches = 0 )
 
+    if (True):
+        # Draw black (obstacle) and white image for planning
+        fig1=plt.figure();
+        ax1=fig1.gca();
+        ax1.grid(False);
+        ax1.get_xaxis().set_visible(False)
+        ax1.get_yaxis().set_visible(False)
+        ax1.set_xlim([-np.pi, np.pi])
+        ax1.set_ylim([-np.pi, np.pi])
+        ax1.set_aspect('equal', 'box');
+
+        print "Now plotting ", len(collisions_theta1), " collision points for C-space obstacles ..."
+        ax1.scatter(collisions_theta1,collisions_theta2,c='black',alpha=0.5,edgecolors='none')
+        fig1.savefig( "config_space_bw.png", format = "png", bbox_inches = 'tight', pad_inches = 0 )
 
 
 if (True):
