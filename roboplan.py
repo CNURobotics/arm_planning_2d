@@ -186,7 +186,7 @@ if (True): # build C-space map
         ax1.set_xlim([-np.pi, np.pi])
         ax1.set_ylim([-np.pi, np.pi])
         ax1.set_aspect('equal', 'box');
-
+        ax1.axis('off')
         print "Now plotting ", len(collisions_theta1), " collision points for C-space obstacles ..."
         ax1.scatter(collisions_theta1,collisions_theta2,c='black',alpha=0.5,edgecolors='none')
         fig1.savefig( "config_space_bw.png", format = "png", bbox_inches = 'tight', pad_inches = 0 )
