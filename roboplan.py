@@ -43,13 +43,20 @@ import sys
 # Import our simple simulation
 from RobotWorld import *
 
+target_dir = "output"
+if not os.path.exists(target_dir):
+    print("Creating target directory <",target_dir,"> ...")
+    try:   os.makedirs(target_dir)
+    except:
+        print("Failed to create target path!")
+        exit()
 
 # This is the main body of the program
 
 # Define links for our simple robot
 #             ID   Length, color, width, parent(=None default)
-link1 = Link(" 1 ", 10.0,'b',0.5)
-link2 = Link(" 2 ", 6.0,'g',0.3, link1)
+link1 = Link(" 1 ", 10.0,'b','b',0.5)
+link2 = Link(" 2 ",  6.0,'g','c',0.3, link1)
 
 # Define a robot with tuple of links (2 in this case but could add more)
 robot = RobotArm((link1, link2))
@@ -64,7 +71,7 @@ obj5 = Obstacle("E", ( -5.0, 10.0), 0.75, [0.5,1.0,0.5])
 obj6 = Obstacle("F", (-10.0,  5.0), 1.5 , [0.5,0.5,1.0])
 
 # Store a tuple of all obstacles
-obstacles = (obj1, obj2, obj3, obj4, obj5, obj6)
+obstacles = ()#obj1, obj2, obj3, obj4, obj5, obj6)
 
 
 
@@ -75,7 +82,7 @@ world = RobotWorld(robot, obstacles)
 
 
 # Define maximum range for our workspace plots
-max_len = (link1.length + link2.length)*1.5;
+max_len = (link1.length + link2.length)*1.5
 
 
 # Define a hand specified list of points that work for this simple environment
@@ -84,8 +91,15 @@ pts = [(0.286, -1.04), (0.5, -2.0), (1.0, -2.125), (1.5, -2.25),
        (0.671, 2.18), (1.5, 2.18), (1.7, 1.8), (1.87, 1.6),
        (2.012, 1.369), (2.27, 0.0), (2.48, -1.26)]
 
-pt0 = np.asarray(deepcopy(pts[0]));# convert tuple to array so we can do math
-pt1 = np.asarray(deepcopy(pts[-1]));# convert tuple to array so we can do math
+tv = np.linspace(0.,1.0,20)
+pts=[]
+for t in tv:
+    pts.append( ( np.pi/2.0 + (np.pi/6.)*np.cos(2.0*np.pi*t),  (np.pi/3.0)*np.sin(2.0*np.pi*t) ))
+
+print " pts=",pts
+
+pt0 = np.asarray(deepcopy(pts[0]))# convert tuple to array so we can do math
+pt1 = np.asarray(deepcopy(pts[-1]))# convert tuple to array so we can do math
 
 if (np.array_equal(pt0,pt1)):
     print "Points are equal"
@@ -117,7 +131,7 @@ def theta2xyz(t1,t2):
 if (True): # build C-space map
 
     print "Define the torus ..."
-    pi_diff = np.pi/100.0;#72.0;#36.0
+    pi_diff = np.pi/100.0#72.0#36.0
     thetas = np.arange(-np.pi, np.pi+pi_diff, pi_diff)
     t1grid,t2grid = np.meshgrid(thetas,thetas)
 
@@ -130,10 +144,10 @@ if (True): # build C-space map
         for theta2 in thetas:
 
             # update the position of the links in the world
-            world.updateRobotArm((theta1,theta2));
+            world.updateRobotArm((theta1,theta2))
 
             # Store the location of the end effector
-            tip = world.robot.getEndEffector();
+            tip = world.robot.getEndEffector()
 
             workspace_x.append(tip[0])
             workspace_y.append(tip[1])
@@ -150,12 +164,12 @@ if (True): # build C-space map
 
 
     print "plot the C-space ..."
-    fig1=plt.figure();
-    ax1=fig1.gca();
-    ax1.grid(True);
+    fig1=plt.figure()
+    ax1=fig1.gca()
+    ax1.grid(True)
     ax1.set_xlim([-np.pi, np.pi])
     ax1.set_ylim([-np.pi, np.pi])
-    ax1.set_aspect('equal', 'box');
+    ax1.set_aspect('equal', 'box')
 
     print "Now plotting ", len(collisions_theta1), " collision points for C-space obstacles ..."
     ax1.scatter(collisions_theta1,collisions_theta2,c=collisions_colors,alpha=0.5,edgecolors='none')
@@ -163,96 +177,96 @@ if (True): # build C-space map
 
     if (False):
       print "Show path on C-space ..."
-      Xp=[];
-      Yp=[];
+      Xp=[]
+      Yp=[]
       for pt in pts:
         Xp.append(pt[0])
         Yp.append(pt[1])
 
-      ax1.plot(Xp,Yp);
+      ax1.plot(Xp,Yp)
 
-      ax1.plot(pts[0][0],pts[0][1],color='g',marker='o');
-      ax1.plot(pts[-1][0],pts[-1][1],color='r',marker='x');
+      ax1.plot(pts[0][0],pts[0][1],color='g',marker='o')
+      ax1.plot(pts[-1][0],pts[-1][1],color='r',marker='x')
 
-    fig1.savefig( "config_space.png", format = "png", bbox_inches = 'tight', pad_inches = 0 )
+    fig1.savefig( target_dir+"/config_space.png", format = "png", bbox_inches = 'tight', pad_inches = 0 )
 
     if (True):
         # Draw black (obstacle) and white image for planning
-        fig1=plt.figure();
-        ax1=fig1.gca();
-        ax1.grid(False);
+        fig1=plt.figure()
+        ax1=fig1.gca()
+        ax1.grid(False)
         ax1.get_xaxis().set_visible(False)
         ax1.get_yaxis().set_visible(False)
         ax1.set_xlim([-np.pi, np.pi])
         ax1.set_ylim([-np.pi, np.pi])
-        ax1.set_aspect('equal', 'box');
+        ax1.set_aspect('equal', 'box')
         ax1.axis('off')
         print "Now plotting ", len(collisions_theta1), " collision points for C-space obstacles ..."
         ax1.scatter(collisions_theta1,collisions_theta2,c='black',alpha=0.5,edgecolors='none')
-        fig1.savefig( "config_space_bw.png", format = "png", bbox_inches = 'tight', pad_inches = 0 )
+        fig1.savefig( target_dir+"/config_space_bw.png", format = "png", bbox_inches = 'tight', pad_inches = 0 )
 
 
 if (True):
     print "Draw start ..."
     robot.updateLinks(pts[0])
-    fig2=plt.figure();
+    fig2=plt.figure()
     fig2.suptitle("Start")
-    ax2 = fig2.gca();
-    ax2.grid(True);
+    ax2 = fig2.gca()
+    ax2.grid(True)
     ax2.set_xlim([-max_len, max_len])
     ax2.set_ylim([-max_len, max_len])
-    ax2.set_aspect('equal', 'box');
+    ax2.set_aspect('equal', 'box')
 
     world.drawWorld(ax2) # Draw robot and obstacles
-    fig2.savefig( "start_position.png", format = "png", bbox_inches = 'tight', pad_inches = 0 )
+    fig2.savefig( target_dir+"/start_position.png", format = "png", bbox_inches = 'tight', pad_inches = 0 )
 
 
 if (True):
     print "Draw finish ..."
     robot.updateLinks(pts[-1]) # get last point in path list
 
-    fig3=plt.figure();
+    fig3=plt.figure()
     fig3.suptitle("Finish")
-    ax3 = fig3.gca();
-    ax3.grid(True);
+    ax3 = fig3.gca()
+    ax3.grid(True)
     ax3.set_xlim([-max_len, max_len])
     ax3.set_ylim([-max_len, max_len])
-    ax3.set_aspect('equal', 'box');
+    ax3.set_aspect('equal', 'box')
 
-    world.drawWorld(ax3);
+    world.drawWorld(ax3)
 
-    fig3.savefig( "finish_position.png", format = "png", bbox_inches = 'tight', pad_inches = 0 )
+    fig3.savefig( target_dir+"/finish_position.png", format = "png", bbox_inches = 'tight', pad_inches = 0 )
 
 
 if (True):
     print "Draw intermediates ..."
-    fig4=plt.figure();
+    fig4=plt.figure()
     fig4.suptitle("Motion")
-    ax4 = fig4.gca();
-    ax4.grid(True);
+    ax4 = fig4.gca()
+    ax4.grid(True)
     ax4.set_xlim([-max_len, max_len])
     ax4.set_ylim([-max_len, max_len])
-    ax4.set_aspect('equal', 'box');
+    ax4.set_aspect('equal', 'box')
 
     for pt in pts:
-        world.updateRobotArm(pt);
-        robot.drawArm(ax4)
+        world.updateRobotArm(pt)
+        robot.drawArm(ax4,True)
 
     for obj in obstacles:
        obj.drawObstacle(ax4)
-    fig4.savefig( "motion_snapshots.png", format = "png", bbox_inches = 'tight', pad_inches = 0 )
+    fig4.savefig( target_dir+"/motion_snapshots.png", format = "png", bbox_inches = 'tight', pad_inches = 0 )
 
 
 if (True):
     if (len(workspace_x) > 0): # C-space was built
         print "Now show the workspace with ",len(workspace_x), " points, and ",len(free_workspace_x)," free points"
-        fig5=plt.figure();
+        fig5=plt.figure()
         fig5.suptitle("Workspace")
-        ax5 = fig5.gca();
-        ax5.grid(True);
+        ax5 = fig5.gca()
+        ax5.grid(True)
         ax5.set_xlim([-max_len, max_len])
         ax5.set_ylim([-max_len, max_len])
-        ax5.set_aspect('equal', 'box');
+        ax5.set_aspect('equal', 'box')
 
         ax5.scatter(workspace_x,workspace_y,color='b', edgecolors='none')
 
@@ -260,7 +274,7 @@ if (True):
 
         for obj in obstacles:
           obj.drawObstacle(ax5)
-        fig5.savefig( "workspace.png", format = "png", bbox_inches = 'tight', pad_inches = 0 )
+        fig5.savefig( target_dir+"/workspace.png", format = "png", bbox_inches = 'tight', pad_inches = 0 )
 
     else:
         print "No C-space map was built!"
@@ -269,12 +283,20 @@ if (torus is not None):
     print "Draw the torus ..."
     fig7=plt.figure()
     ax7 = fig7.add_subplot(111,projection='3d')
-    ax7.plot_surface(torus[0],torus[1],torus[2])
+    ax7.plot_surface(torus[0],torus[1],torus[2],alpha=0.5)
     ax7.set_xlim([-max_len, max_len])
     ax7.set_ylim([-max_len, max_len])
     ax7.set_zlim([-max_len, max_len])
-    ax7.set_aspect('equal', 'box');
-    fig7.savefig( "torus.png", format = "png", bbox_inches = 'tight', pad_inches = 0 )
+    ax7.set_aspect('equal', 'box')
+    xt,yt,zt = theta2xyz(pt0[0],pt0[1])
+    ax7.plot([xt],[yt],[zt],marker='.',markersize=2,color='c')
+    axx=ax7.get_axes()
+    azm=120.0 #axx.azim
+    ele=axx.elev
+    print " azm=",azm,"  ele=",ele
+    ax7.view_init(elev=ele, azim=azm)
+
+    fig7.savefig(target_dir+"/torus.png", format = "png", bbox_inches = 'tight', pad_inches = 0 )
 
     if (len(collisions_theta1) > 0):
         print "Draw the torus with collisions ..."
@@ -284,13 +306,13 @@ if (torus is not None):
         ax8.set_xlim([-max_len, max_len])
         ax8.set_ylim([-max_len, max_len])
         ax8.set_zlim([-max_len, max_len])
-        ax8.set_aspect('equal', 'box');
+        ax8.set_aspect('equal', 'box')
 
         torus_objs = theta2xyz(collisions_theta1, collisions_theta2)
         ax8.scatter(torus_objs[0], torus_objs[1], torus_objs[2],
                     c=collisions_colors,alpha=0.5,edgecolors='none')
 
-        fig8.savefig( "torus_obstacles.png", format = "png", bbox_inches = 'tight', pad_inches = 0 )
+        fig8.savefig( target_dir+"/torus_obstacles.png", format = "png", bbox_inches = 'tight', pad_inches = 0 )
 
 print "Close plots to continue ..."
 plt.show()
@@ -301,47 +323,72 @@ plt.show()
 
 print "Make video of motion ..."
 
-fig6=plt.figure();
+fig6 =plt.figure()
 fig6.suptitle("Motion")
-ax6 = fig6.gca();
-ax6.grid(True);
+
+ax6 = fig6.add_subplot(121)
+ax6b = fig6.add_subplot(122,projection='3d')
+ax6.grid(True)
 ax6.set_xlim([-max_len, max_len])
 ax6.set_ylim([-max_len, max_len])
-ax6.set_aspect('equal', 'box');
+ax6.set_aspect('equal', 'box')
+
 
 pt0 = np.asarray(deepcopy(pts[0]) )
-robot.updateLinks(pt0);
-robot.drawArm(ax6)
+robot.updateLinks(pt0)
+robot.drawArm(ax6, True)
+robot.drawEE(ax6)
 
 for obj in obstacles:
    obj.drawObstacle(ax6)
 
-cnt=0;
+ax7 = fig7.add_subplot(111,projection='3d')
+ax6b.plot_surface(torus[0],torus[1],torus[2])
+ax6b.set_xlim([-max_len, max_len])
+ax6b.set_ylim([-max_len, max_len])
+ax6b.set_zlim([-max_len, max_len])
+ax6b.set_aspect('equal', 'box')
+xt,yt,zt = theta2xyz(pt0[0],pt0[1])
+ax6b.plot([xt],[yt],[zt],marker='.',markersize=2,color='c')
+ax6b.view_init(elev=ele, azim=azm)
 
-fig6.savefig( "roboplan_animation_0.png", format = "png", bbox_inches = 'tight', pad_inches = 0 )
+cnt=0
 
-pt0 = np.asarray(deepcopy(pts[0]));# convert tuple to array so we can do math
+fig6.savefig( target_dir+"/roboplan_animation_0.png", format = "png", bbox_inches = 'tight', pad_inches = 0 )
 
+pt0 = np.asarray(deepcopy(pts[0]))# convert tuple to array so we can do math
+
+xee = []
+yee = []
+
+cnt = 0
 for pt in pts:
     pt1 = np.asarray(deepcopy(pt)) # convert tuple to array so we can do math
     print pt1
     if (not np.array_equal(pt1,pt0)):
-      for s in np.arange(0.025,1.0,0.025): # interpolate along line from prior point to current
+      for s in np.arange(0.0,1.0,0.05): # interpolate along line from prior point to current
         pti = pt0 + (pt1-pt0)*s
         #print pti
 
-        plt.cla()
-        ax6.grid(True);
+        ax6.cla()
+        ax6.grid(True)
         ax6.set_xlim([-max_len, max_len])
         ax6.set_ylim([-max_len, max_len])
-        ax6.set_aspect('equal', 'box');
+        ax6.set_aspect('equal', 'box')
 
-        world.updateRobotArm(pti);
-        world.drawWorld(ax6)
+        world.updateRobotArm(pti)
+        world.drawWorld(ax6,True)
+        xee.append( robot.links[-1].tip[0] )
+        yee.append( robot.links[-1].tip[1] )
+
+        ax6.plot(xee,yee,marker='.',markersize=2,color='c')
+
+        xt,yt,zt = theta2xyz(pti[0],pti[1])
+        ax6b.plot([xt],[yt],[zt],marker='.',markersize=2,color='c')
 
         cnt = cnt +1
 
-        fig6.savefig( "roboplan_animation_"+str(cnt)+".png", format = "png", bbox_inches = 'tight', pad_inches = 0 )
+        fig6.savefig( target_dir+"/roboplan_animation_"+str(cnt)+".png", format = "png", bbox_inches = 'tight', pad_inches = 0 )
 
     pt0 = pt1
 
