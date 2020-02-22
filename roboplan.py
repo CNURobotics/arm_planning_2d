@@ -296,9 +296,9 @@ if (torus is not None):
     ax7.set_aspect('equal', 'box')
     xt,yt,zt = theta2xyz(pt0[0],pt0[1])
     ax7.plot([xt],[yt],[zt],marker='.',markersize=2,color='c')
-    azm=120.0 #axx.azim
+    azm=120.0
     ele=ax7.elev
-    print " azm=",azm,"  ele=",ele
+    print(" azm=",azm,"  ele=",ele)
     ax7.view_init(elev=ele, azim=azm)
 
     fig7.savefig(target_dir+"/torus.png", format = "png", bbox_inches = 'tight', pad_inches = 0 )
