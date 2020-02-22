@@ -6,7 +6,7 @@
 
     The MIT License (MIT)
 
-    Copyright (c) 2015 David Conner (david.conner@cnu.edu)
+    Copyright (c) 2015-2020 David Conner (david.conner@cnu.edu)
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -43,7 +43,45 @@ import sys
 # Import our simple simulation
 from RobotWorld import *
 
-target_dir = "output"
+# Set up environment
+target_dir = "output" # Directory to store output files
+trace = False # True # Trace the end effector during motion
+with_obstacles = True
+
+# Define links for our simple robot
+#             ID   Length, color, tip color, width, parent(=None default)
+link1 = Link(" 1 ", 10.0, 'b', 'b', 0.5)
+link2 = Link(" 2 ",  6.0, 'g', 'c', 0.3, link1)
+
+# Define obstacles
+obstacles = ( )
+if (with_obstacles):
+    print("Using obstacles in environment ...")
+    obj1 = Obstacle("A", ( -5.0,  0.0), 0.5 , [0.5,0.0,0.0])
+    obj2 = Obstacle("B", (  5.0,  0.0), 0.5 , [1.0,0.0,0.0])
+    obj3 = Obstacle("C", (  0.0, 12.0), 1.5 , [0.5,0.5,0.5])
+    obj4 = Obstacle("D", ( 10.0,  5.0), 0.85, [1.0,0.5,0.5])
+    obj5 = Obstacle("E", ( -5.0, 10.0), 0.75, [0.5,1.0,0.5])
+    obj6 = Obstacle("F", (-10.0,  5.0), 1.5 , [0.5,0.5,1.0])
+
+    # Store a tuple of all obstacles
+    obstacles = (obj1, obj2, obj3, obj4, obj5, obj6)
+
+    # Simple path that moves collision free
+    pts = [(0.286, -1.04), (0.5, -2.0), (1.0, -2.125), (1.5, -2.25),
+           (1.48, -1.82),  (1.42, -1.42), (1.0, -0.75), (0.75, 1.0), (0.6, 1.5),
+           (0.671, 2.18), (1.5, 2.18), (1.7, 1.8), (1.87, 1.6),
+           (2.012, 1.369), (2.27, 0.0), (2.48, -1.26)]
+
+else:
+    print("Using simple motion in free space ...")
+    # Define a simple motion for arms
+    tv = np.linspace(0.,1.0,20)
+    pts=[]
+    for t in tv:
+        pts.append( ( np.pi/2.0 + (np.pi/6.)*np.cos(2.0*np.pi*t),  (np.pi/3.0)*np.sin(2.0*np.pi*t) ))
+
+
 if not os.path.exists(target_dir):
     print("Creating target directory <",target_dir,"> ...")
     try:   os.makedirs(target_dir)
@@ -52,49 +90,17 @@ if not os.path.exists(target_dir):
         exit()
 
 # This is the main body of the program
-
-# Define links for our simple robot
-#             ID   Length, color, width, parent(=None default)
-link1 = Link(" 1 ", 10.0,'b','b',0.5)
-link2 = Link(" 2 ",  6.0,'g','c',0.3, link1)
-
 # Define a robot with tuple of links (2 in this case but could add more)
 robot = RobotArm((link1, link2))
 robot.updateLinks((np.pi/4.0, -np.pi/6.0)) # Define the initial angles
-
-# Define obstacles
-obj1 = Obstacle("A", ( -5.0,  0.0), 0.5 , [0.5,0.0,0.0])
-obj2 = Obstacle("B", (  5.0,  0.0), 0.5 , [1.0,0.0,0.0])
-obj3 = Obstacle("C", (  0.0, 12.0), 1.5 , [0.5,0.5,0.5])
-obj4 = Obstacle("D", ( 10.0,  5.0), 0.85, [1.0,0.5,0.5])
-obj5 = Obstacle("E", ( -5.0, 10.0), 0.75, [0.5,1.0,0.5])
-obj6 = Obstacle("F", (-10.0,  5.0), 1.5 , [0.5,0.5,1.0])
-
-# Store a tuple of all obstacles
-obstacles = ()#obj1, obj2, obj3, obj4, obj5, obj6)
-
-
 
 world = RobotWorld(robot, obstacles)
 
 #link1.updateTip(np.pi/4.0)
 #link2.updateTip(np.pi/6.0)
 
-
 # Define maximum range for our workspace plots
 max_len = (link1.length + link2.length)*1.5
-
-
-# Define a hand specified list of points that work for this simple environment
-pts = [(0.286, -1.04), (0.5, -2.0), (1.0, -2.125), (1.5, -2.25),
-       (1.48, -1.82),  (1.42, -1.42), (1.0, -0.75), (0.75, 1.0), (0.6, 1.5),
-       (0.671, 2.18), (1.5, 2.18), (1.7, 1.8), (1.87, 1.6),
-       (2.012, 1.369), (2.27, 0.0), (2.48, -1.26)]
-
-tv = np.linspace(0.,1.0,20)
-pts=[]
-for t in tv:
-    pts.append( ( np.pi/2.0 + (np.pi/6.)*np.cos(2.0*np.pi*t),  (np.pi/3.0)*np.sin(2.0*np.pi*t) ))
 
 print " pts=",pts
 
@@ -250,7 +256,7 @@ if (True):
 
     for pt in pts:
         world.updateRobotArm(pt)
-        robot.drawArm(ax4,True)
+        robot.drawArm(ax4,trace)
 
     for obj in obstacles:
        obj.drawObstacle(ax4)
@@ -322,7 +328,6 @@ plt.show()
 #sys.exit(0)
 
 print "Make video of motion ..."
-
 fig6 =plt.figure()
 fig6.suptitle("Motion")
 
@@ -336,7 +341,7 @@ ax6.set_aspect('equal', 'box')
 
 pt0 = np.asarray(deepcopy(pts[0]) )
 robot.updateLinks(pt0)
-robot.drawArm(ax6, True)
+robot.drawArm(ax6, trace)
 robot.drawEE(ax6)
 
 for obj in obstacles:
@@ -394,8 +399,8 @@ for pt in pts:
 
 print "Done!"
 print ""
-print "In Ubuntu, we can use the following to create an avi video from images:"
+print "We can use the following to create a video from images:"
 print ""
-print "avconv -r 30 -i roboplan_animation_%d.png -b:v 1000k roboplan.avi"
+print "ffmpeg -r 20 -i roboplan_animation_%d.png -vcodec libx264 -crf 15 roboplan.mp4"
 print ""
 print "Done!"

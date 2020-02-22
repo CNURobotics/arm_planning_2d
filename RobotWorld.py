@@ -7,7 +7,7 @@
 
     The MIT License (MIT)
 
-    Copyright (c) 2015 David Conner (david.conner@cnu.edu)
+    Copyright (c) 2015-2020 David Conner (david.conner@cnu.edu)
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -165,10 +165,10 @@ class RobotArm:
             link.drawLink(ax)
 
         if (trace):
-            print "Drawing the EE"
+            #print "Drawing the EE"
             self.drawEE(ax)
-        else:
-            print "No trace"
+        #else:
+        #    print "No trace"
 
     # Draw the final end effector position
     def drawEE(self, ax):
@@ -210,7 +210,7 @@ class RobotWorld:
 
     # Draw the robot
     def drawRobot(self, ax, trace=False):
-        print "world trace=",trace
+        #print "world trace=",trace
         self.robot.drawArm(ax,trace)
 
     # Draw both robot arm and obstacles
