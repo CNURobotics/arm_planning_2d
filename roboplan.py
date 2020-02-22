@@ -296,9 +296,8 @@ if (torus is not None):
     ax7.set_aspect('equal', 'box')
     xt,yt,zt = theta2xyz(pt0[0],pt0[1])
     ax7.plot([xt],[yt],[zt],marker='.',markersize=2,color='c')
-    axx=ax7.get_axes()
     azm=120.0 #axx.azim
-    ele=axx.elev
+    ele=ax7.elev
     print " azm=",azm,"  ele=",ele
     ax7.view_init(elev=ele, azim=azm)
 
