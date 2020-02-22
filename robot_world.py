@@ -108,7 +108,7 @@ class RobotArm:
     def updateLinks(self, angles):
 
         if (len(angles) != len(self.links)):
-            print "Invalid angles! - need one per link"
+            print("Invalid angles! - need one per link")
             sys.exit(-1)
 
         # Assuming list of angles with one angle for each link

@@ -41,7 +41,7 @@ import sys
 
 
 # Import our simple simulation
-from RobotWorld import *
+from robot_world import *
 
 # Set up environment
 target_dir = "output" # Directory to store output files
@@ -102,15 +102,15 @@ world = RobotWorld(robot, obstacles)
 # Define maximum range for our workspace plots
 max_len = (link1.length + link2.length)*1.5
 
-print " pts=",pts
+print(" pts=",pts)
 
 pt0 = np.asarray(deepcopy(pts[0]))# convert tuple to array so we can do math
 pt1 = np.asarray(deepcopy(pts[-1]))# convert tuple to array so we can do math
 
 if (np.array_equal(pt0,pt1)):
-    print "Points are equal"
+    print("Points are equal")
 else:
-    print "Points are NOT equal"
+    print("Points are NOT equal")
 
 
 # store angles and color of collision
@@ -136,7 +136,7 @@ def theta2xyz(t1,t2):
 
 if (True): # build C-space map
 
-    print "Define the torus ..."
+    print("Define the torus ...")
     pi_diff = np.pi/100.0#72.0#36.0
     thetas = np.arange(-np.pi, np.pi+pi_diff, pi_diff)
     t1grid,t2grid = np.meshgrid(thetas,thetas)
@@ -144,7 +144,7 @@ if (True): # build C-space map
     torus = theta2xyz(t1grid, t2grid)
 
 
-    print "Now building the C-space map ..."
+    print("Now building the C-space map ...")
     for theta1 in thetas:
         #print "theta1=",theta1
         for theta2 in thetas:
@@ -169,7 +169,7 @@ if (True): # build C-space map
                     free_workspace_y.append(robot.links[-1].tip[1])
 
 
-    print "plot the C-space ..."
+    print("plot the C-space ...")
     fig1=plt.figure()
     ax1=fig1.gca()
     ax1.grid(True)
@@ -177,12 +177,12 @@ if (True): # build C-space map
     ax1.set_ylim([-np.pi, np.pi])
     ax1.set_aspect('equal', 'box')
 
-    print "Now plotting ", len(collisions_theta1), " collision points for C-space obstacles ..."
+    print("Now plotting ", len(collisions_theta1), " collision points for C-space obstacles ...")
     ax1.scatter(collisions_theta1,collisions_theta2,c=collisions_colors,alpha=0.5,edgecolors='none')
 
 
     if (False):
-      print "Show path on C-space ..."
+      print("Show path on C-space ...")
       Xp=[]
       Yp=[]
       for pt in pts:
@@ -207,13 +207,13 @@ if (True): # build C-space map
         ax1.set_ylim([-np.pi, np.pi])
         ax1.set_aspect('equal', 'box')
         ax1.axis('off')
-        print "Now plotting ", len(collisions_theta1), " collision points for C-space obstacles ..."
+        print("Now plotting ", len(collisions_theta1), " collision points for C-space obstacles ...")
         ax1.scatter(collisions_theta1,collisions_theta2,c='black',alpha=0.5,edgecolors='none')
         fig1.savefig( target_dir+"/config_space_bw.png", format = "png", bbox_inches = 'tight', pad_inches = 0 )
 
 
 if (True):
-    print "Draw start ..."
+    print("Draw start ...")
     robot.updateLinks(pts[0])
     fig2=plt.figure()
     fig2.suptitle("Start")
@@ -228,7 +228,7 @@ if (True):
 
 
 if (True):
-    print "Draw finish ..."
+    print("Draw finish ...")
     robot.updateLinks(pts[-1]) # get last point in path list
 
     fig3=plt.figure()
@@ -245,7 +245,7 @@ if (True):
 
 
 if (True):
-    print "Draw intermediates ..."
+    print("Draw intermediates ...")
     fig4=plt.figure()
     fig4.suptitle("Motion")
     ax4 = fig4.gca()
@@ -265,7 +265,7 @@ if (True):
 
 if (True):
     if (len(workspace_x) > 0): # C-space was built
-        print "Now show the workspace with ",len(workspace_x), " points, and ",len(free_workspace_x)," free points"
+        print("Now show the workspace with ",len(workspace_x), " points, and ",len(free_workspace_x)," free points")
         fig5=plt.figure()
         fig5.suptitle("Workspace")
         ax5 = fig5.gca()
@@ -283,10 +283,10 @@ if (True):
         fig5.savefig( target_dir+"/workspace.png", format = "png", bbox_inches = 'tight', pad_inches = 0 )
 
     else:
-        print "No C-space map was built!"
+        print("No C-space map was built!")
 
 if (torus is not None):
-    print "Draw the torus ..."
+    print("Draw the torus ...")
     fig7=plt.figure()
     ax7 = fig7.add_subplot(111,projection='3d')
     ax7.plot_surface(torus[0],torus[1],torus[2],alpha=0.5)
@@ -304,7 +304,7 @@ if (torus is not None):
     fig7.savefig(target_dir+"/torus.png", format = "png", bbox_inches = 'tight', pad_inches = 0 )
 
     if (len(collisions_theta1) > 0):
-        print "Draw the torus with collisions ..."
+        print("Draw the torus with collisions ...")
         fig8=plt.figure()
         ax8 = fig8.add_subplot(111,projection='3d')
         ax8.plot_wireframe(torus[0],torus[1],torus[2],alpha=0.5,rstride=4,cstride=4,color='black')
@@ -319,14 +319,14 @@ if (torus is not None):
 
         fig8.savefig( target_dir+"/torus_obstacles.png", format = "png", bbox_inches = 'tight', pad_inches = 0 )
 
-print "Close plots to continue ..."
+print("Close plots to continue ...")
 plt.show()
 
 
 #print "Done! - comment out the exit below to create images for motion video"
 #sys.exit(0)
 
-print "Make video of motion ..."
+print("Make video of motion ...")
 fig6 =plt.figure()
 fig6.suptitle("Motion")
 
@@ -368,7 +368,7 @@ yee = []
 cnt = 0
 for pt in pts:
     pt1 = np.asarray(deepcopy(pt)) # convert tuple to array so we can do math
-    print pt1
+    print(pt1)
     if (not np.array_equal(pt1,pt0)):
       for s in np.arange(0.0,1.0,0.05): # interpolate along line from prior point to current
         pti = pt0 + (pt1-pt0)*s
@@ -396,10 +396,10 @@ for pt in pts:
 
     pt0 = pt1
 
-print "Done!"
-print ""
-print "We can use the following to create a video from images:"
-print ""
-print "ffmpeg -r 20 -i roboplan_animation_%d.png -vcodec libx264 -crf 15 roboplan.mp4"
-print ""
-print "Done!"
+print("Done!")
+print("")
+print("We can use the following to create a video from images:")
+print("")
+print("ffmpeg -r 20 -i roboplan_animation_%d.png -vcodec libx264 -crf 15 roboplan.mp4")
+print("")
+print("Done!")

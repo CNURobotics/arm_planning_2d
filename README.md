@@ -7,4 +7,4 @@ The code is intended to illustrate the topology and C-space obstacles for simple
 
 In this current version, the link sizes and obstacle locations and sizes are hard coded in the main function, but they are easy to modify.
 
-The code has been tested on Ubuntu 14.04 and MAC OSX with Python 2.7, OpenCV (cv2), Numpy, and Matplotlib.
+The code has been tested on Ubuntu 18.04 and MAC OSX with Python 3.7, OpenCV (cv2), Numpy, and Matplotlib.
